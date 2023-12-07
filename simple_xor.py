@@ -1,5 +1,6 @@
 def xor(char:str, key:int) -> str:
     return chr(ord(char) ^ key)
+
 def encrypt(message:str, key:int) -> str:
     return "".join([xor(char,key) for char in message])
 
@@ -8,7 +9,7 @@ def decrypt(ciphertext:str, key:int) -> str:
 
 def cli():
     import argparse
-    parser = argparse.ArgumentParser(description='XOR cipher\nA command line tool to encrypt/decrypt messages using the XOR cipher')
+    parser = argparse.ArgumentParser(description='XOR cipher - A command line tool to encrypt/decrypt messages using the XOR cipher')
     parser.add_argument('--encrypt', '-e', help='Encrypts a message')
     parser.add_argument('--decrypt', '-d', help='Decrypts a cypher text')
     parser.add_argument('--key', '-k', type=int, help='Key to encrypt/decrypt with')
