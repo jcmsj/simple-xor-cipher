@@ -1,16 +1,44 @@
 from os import urandom
+from typing import Callable
 from file import export_to_file, import_from_file
 
 def xor_bytes(s:bytes, t:bytes) -> bytes:
     """Concate xor two strings together."""
-    if isinstance(s, bytes):
-        # Bytes objects contain integer values in the range 0-255
-        return bytes([a ^ b for a, b in zip(s, t)])
-    else:
-        raise TypeError("'s' must have the type 'bytes'.")
+    return bytes([a ^ b for a, b in zip(s, t)])
 
-def xor_str(s:str, t:str) -> bytes:
-    return xor_bytes(s.encode(), t.encode())
+def xor_curry(callback: Callable[[bytes, bytes], bytes]):
+    def wrapper(s:str, t:str):
+        return callback(s.encode(), t.encode())
+    return wrapper
+
+def xor_verbose(s:int, t:int) -> int:
+    """XOR two strings together."""
+    result = s ^ t
+    # with leading zeroes
+    bin_s = bin(s)[2:]
+    bin_t = bin(t)[2:]
+    bin_length = max(
+        len(bin_s),
+        len(bin_t)
+    )
+    # pad the shorter bin
+    if len(bin_s)< len(bin_t):
+        bin_s = bin_s.zfill(bin_length)
+    else: 
+        bin_t = bin_t.zfill(bin_length)
+
+    padded_result = bin(s^t)[2:].zfill(bin_length)
+    print(f"   {bin_s}")
+    print(f"   {bin_t}")
+    print(f"XOR{'-'*bin_length}")
+    print(f"   {padded_result}\n")
+    return result
+def xor_tutorial(s:bytes, t:bytes) -> bytes:
+    """XOR the byte representations of a character."""
+    return bytes([xor_verbose(a,b) for a, b in zip(s, t)])
+
+xor_tutorial_str = xor_curry(xor_tutorial)
+xor_str = xor_curry(xor_bytes)
 
 def genkey(length: int) -> bytes:
     """Generate key."""
@@ -20,11 +48,10 @@ def cli():
     import argparse
     parser = argparse.ArgumentParser(description='XOR cipher - A command line tool to encrypt/decrypt messages using the XOR cipher')
     parser.add_argument('--encrypt', '-e', help='Encrypts a message')
-    parser.add_argument('--decrypt', '-d', help='Decrypts a cypher text')
+    parser.add_argument('--decrypt', '-d', help='Decrypts a file containing the cipher text')
     parser.add_argument('--key', '-k', help='Key to encrypt/decrypt with')
-    parser.add_argument('--key-int', help='Integer key to encrypt/decrypt with', type=int)
     parser.add_argument('--export', '-x', help='Export encrypted message to a file')
-    parser.add_argument('--file', '-f', help='Decrypts a cypher text from a file')
+    parser.add_argument('--verbose', '-v', help='Verbose mode, shows the entire encryption/decryption process', action='store_true')
     return parser
 
 def repeat_key_till_length(key:str, length:int) -> str:
@@ -39,7 +66,10 @@ def main():
     # Encryption check
     if args.key and args.encrypt:
         padded_key = repeat_key_till_length(args.key, len(args.encrypt)).encode()
-        encrypted_message = xor_bytes(args.encrypt.encode(), padded_key)
+        if args.verbose:
+            encrypted_message = xor_tutorial(args.encrypt.encode(), padded_key)
+        else:
+            encrypted_message = xor_bytes(args.encrypt.encode(), padded_key)
         encrypted_message_str = encrypted_message.decode()
         print(f"Padded key:\n{padded_key.decode()}")
         if args.export:
@@ -51,10 +81,12 @@ def main():
         return
     
     # Decryption check
-    if args.file:
-        args.decrypt = import_from_file(args.file)
     if args.key and args.decrypt:
-        decrypted_message = xor_str(args.decrypt, args.key)
+        ciphertext = import_from_file(args.decrypt)
+        if args.verbose:
+            decrypted_message = xor_tutorial(ciphertext.encode() , args.key.encode())
+        else:
+            decrypted_message = xor_str(ciphertext, args.key)
         decrypted_message_str = decrypted_message.decode()
         print(f"Decrypted message:\n{decrypted_message_str}")
 
