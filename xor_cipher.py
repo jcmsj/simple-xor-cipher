@@ -1,9 +1,8 @@
-from os import urandom
 from typing import Callable
 from file import export_to_file, import_from_file
 
 def xor_bytes(s:bytes, t:bytes) -> bytes:
-    """Concate xor two strings together."""
+    """Concat xor two strings together."""
     return bytes([a ^ b for a, b in zip(s, t)])
 
 def xor_curry(callback: Callable[[bytes, bytes], bytes]):
@@ -34,15 +33,11 @@ def xor_verbose(s:int, t:int) -> int:
     print(f"   {padded_result}\n")
     return result
 def xor_tutorial(s:bytes, t:bytes) -> bytes:
-    """XOR the byte representations of a character."""
+    """XOR the byte representations of two characters"""
     return bytes([xor_verbose(a,b) for a, b in zip(s, t)])
 
 xor_tutorial_str = xor_curry(xor_tutorial)
 xor_str = xor_curry(xor_bytes)
-
-def genkey(length: int) -> bytes:
-    """Generate key."""
-    return urandom(length)
 
 def cli():
     import argparse
