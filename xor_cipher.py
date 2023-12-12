@@ -55,12 +55,12 @@ def main():
     # Encryption check
     if args.key and args.encrypt:
         padded_key = repeat_key_till_length(args.key, len(args.encrypt)).encode()
+        print(f"Padded key:\n{padded_key.decode()}")
         if args.verbose:
             encrypted_message = xor_tutorial(args.encrypt.encode(), padded_key)
         else:
             encrypted_message = xor_bytes(args.encrypt.encode(), padded_key)
         encrypted_message_str = encrypted_message.decode()
-        print(f"Padded key:\n{padded_key.decode()}")
         if args.export:
             export_to_file(args.export, encrypted_message_str)
             # export the key to a file: args.export + '.key'
