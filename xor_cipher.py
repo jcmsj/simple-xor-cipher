@@ -16,20 +16,14 @@ def xor_verbose(s:int, t:int) -> int:
     # with leading zeroes
     bin_s = bin(s)[2:]
     bin_t = bin(t)[2:]
-    bin_length = max(
-        len(bin_s),
-        len(bin_t)
-    )
-    # pad the shorter bin
-    if len(bin_s)< len(bin_t):
-        bin_s = bin_s.zfill(bin_length)
-    else: 
-        bin_t = bin_t.zfill(bin_length)
-
-    padded_result = bin(s^t)[2:].zfill(bin_length)
+    BIN_LENGTH = 8 # A byte is 8 bits
+    # pad the strings
+    bin_s = bin_s.zfill(BIN_LENGTH)
+    bin_t = bin_t.zfill(BIN_LENGTH)
+    padded_result = bin(s^t)[2:].zfill(BIN_LENGTH)
     print(f"   {bin_s}")
     print(f"   {bin_t}")
-    print(f"XOR{'-'*bin_length}")
+    print(f"XOR{'-'*BIN_LENGTH}")
     print(f"   {padded_result}\n")
     return result
 def xor_tutorial(s:bytes, t:bytes) -> bytes:
